@@ -10,11 +10,11 @@
             background-color: purple;
             margin: 0;
             display: flex;
-            align-items: flex-end; /* alinhar no final para o canto inferior direito */
-            justify-content: flex-end; /* alinhar no final para o canto inferior direito */
+            align-items: flex-end;
+            justify-content: flex-end;
             height: 100vh;
             color: white;
-            position: relative; /* necessário para posicionamento absoluto do relógio e da data */
+            position: relative;
         }
 
         .nav-bar {
@@ -22,39 +22,39 @@
             left: 0;
             top: 0;
             height: 100%;
-            width: 60px; /* largura inicial da barra de navegação */
-            background-color: #2d184d; /* roxo escuro */
-            border-radius: 0 10px 10px 0; /* pontas arredondadas à esquerda */
-            transition: width 0.3s ease; /* Adiciona uma transição suave à propriedade width */
+            width: 60px;
+            background-color: #2d184d;
+            border-radius: 0 10px 10px 0;
+            transition: width 0.3s ease;
             display: flex;
             flex-direction: column;
-            align-items: center; /* centralizar verticalmente */
-            justify-content: flex-start; /* alinhar no início para o topo da barra */
-            overflow: hidden; /* esconder o conteúdo que ultrapassa a altura da barra quando minimizada */
+            align-items: center;
+            justify-content: flex-start;
+            overflow: hidden;
         }
 
         .menu-icon {
-            width: 30px; /* ajuste conforme necessário */
-            height: 30px; /* ajuste conforme necessário */
-            margin: 10px 0; /* ajuste conforme necessário */
+            width: 30px;
+            height: 30px;
+            margin: 10px 0;
         }
 
         .nav-bar.active {
-            width: 200px; /* Largura expandida quando a classe active é adicionada */
+            width: 200px;
         }
 
         .content {
             text-align: center;
             display: flex;
-            align-items: center; /* centralizar verticalmente */
-            justify-content: center; /* centralizar horizontalmente */
-            position: relative; /* necessário para posicionamento absoluto do relógio e da data */
-            flex-grow: 1; /* permite que o conteúdo cresça e empurre o ícone para o centro */
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            flex-grow: 1;
         }
 
         .icon {
-            width: 50%; /* ajuste conforme necessário */
-            height: 50vh; /* ajuste conforme necessário */
+            width: 50%;
+            height: 50vh;
             object-fit: contain;
         }
 
@@ -62,8 +62,8 @@
             position: absolute;
             bottom: 10px;
             right: 10px;
-            font-size: 12px; /* ajuste conforme necessário */
-            font-family: Arial, sans-serif; /* ou qualquer outra fonte desejada */
+            font-size: 12px;
+            font-family: Arial, sans-serif;
         }
 
         @keyframes iconExpand {
@@ -77,16 +77,71 @@
                 transform: translate(0, 0) scale(0.8);
             }
         }
+
+        @keyframes iconReturn {
+            to {
+                transform: translate(50%, -50%) scale(0.8);
+            }
+        }
+
+        @keyframes iconMoveToCorner {
+            to {
+                transform: translate(100%, 0) scale(0.5);
+            }
+        }
     </style>
     <title>PurpleDragonSO</title>
 </head>
 <body>
     <div class="nav-bar">
-        <img src="PurpleDragon/iconmenu.png" alt="Ícone do Menu" class="menu-icon">
+        <img src="img/iconmenu.png" alt="Ícone do Menu" class="menu-icon">
     </div>
     <div class="content">
-        <img src="PurpleDragon/icon.png" alt="Ícone do Sistema" class="icon">
+        <img src="img/icon.png" alt="Ícone do Sistema" class="icon">
         <div id="date-time"></div>
     </div>
 </body>
 </html>
+
+<!-- script.js -->
+
+let isNavBarExpanded = false;
+
+function toggleNavBar() {
+    const navBar = document.querySelector('.nav-bar');
+    isNavBarExpanded = !isNavBarExpanded;
+
+    const icon = document.querySelector('.icon');
+    const iconExpandDuration = 0.3;
+
+    navBar.classList.toggle('active', isNavBarExpanded);
+
+    if (isNavBarExpanded) {
+        icon.style.animation = `iconExpand ${iconExpandDuration}s forwards, iconMoveToCorner ${iconExpandDuration}s ${iconExpandDuration}s forwards`;
+    } else {
+        icon.style.animation = `iconMinimize ${iconExpandDuration}s forwards`;
+
+        icon.addEventListener('animationend', () => {
+            if (!isNavBarExpanded) {
+                icon.style.animation = 'iconReturn 0.3s ease-out forwards';
+            }
+        }, { once: true });
+    }
+}
+
+document.querySelector('.menu-icon').addEventListener('click', toggleNavBar);
+document.querySelector('.icon').addEventListener('click', toggleNavBar);
+
+function atualizarDataHora() {
+    const elementoDataHora = document.getElementById('date-time');
+    const agora = new Date();
+
+    const options = { year: '2-digit', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', hour12: false };
+    const formatoDataHora = new Intl.DateTimeFormat('pt-BR', options);
+
+    const dataHoraFormatada = formatoDataHora.format(agora);
+    elementoDataHora.textContent = dataHoraFormatada;
+}
+
+atualizarDataHora();
+setInterval(atualizarDataHora, 60000);
