@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+    <style>
+        body {
+            background-color: purple;
+            margin: 0;
+            display: flex;
+            align-items: flex-end; /* alinhar no final para o canto inferior direito */
+            justify-content: flex-end; /* alinhar no final para o canto inferior direito */
+            height: 100vh;
+            color: white;
+            position: relative; /* necessário para posicionamento absoluto do relógio e da data */
+        }
+
+        .nav-bar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 60px; /* largura inicial da barra de navegação */
+            background-color: #2d184d; /* roxo escuro */
+            border-radius: 0 10px 10px 0; /* pontas arredondadas à esquerda */
+            transition: width 0.3s ease; /* Adiciona uma transição suave à propriedade width */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* centralizar verticalmente */
+            justify-content: flex-start; /* alinhar no início para o topo da barra */
+            overflow: hidden; /* esconder o conteúdo que ultrapassa a altura da barra quando minimizada */
+        }
+
+        .menu-icon {
+            width: 30px; /* ajuste conforme necessário */
+            height: 30px; /* ajuste conforme necessário */
+            margin: 10px 0; /* ajuste conforme necessário */
+        }
+
+        .nav-bar.active {
+            width: 200px; /* Largura expandida quando a classe active é adicionada */
+        }
+
+        .content {
+            text-align: center;
+            display: flex;
+            align-items: center; /* centralizar verticalmente */
+            justify-content: center; /* centralizar horizontalmente */
+            position: relative; /* necessário para posicionamento absoluto do relógio e da data */
+            flex-grow: 1; /* permite que o conteúdo cresça e empurre o ícone para o centro */
+        }
+
+        .icon {
+            width: 50%; /* ajuste conforme necessário */
+            height: 50vh; /* ajuste conforme necessário */
+            object-fit: contain;
+        }
+
+        #date-time {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px; /* ajuste conforme necessário */
+            font-family: Arial, sans-serif; /* ou qualquer outra fonte desejada */
+        }
+
+        @keyframes iconExpand {
+            to {
+                transform: translate(50%, -50%) scale(0.5);
+            }
+        }
+
+        @keyframes iconMinimize {
+            to {
+                transform: translate(0, 0) scale(0.8);
+            }
+        }
+    </style>
+    <title>PurpleDragonSO</title>
+</head>
+<body>
+    <div class="nav-bar">
+        <img src="img/iconmenu.png" alt="Ícone do Menu" class="menu-icon">
+    </div>
+    <div class="content">
+        <img src="img/icon.png" alt="Ícone do Sistema" class="icon">
+        <div id="date-time"></div>
+    </div>
+</body>
+</html>
