@@ -1,147 +1,193 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="stylesheet" href="styles.css">
-    <script src="script.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Mobile</title>
     <style>
-        body {
-            background-color: purple;
+        * {
             margin: 0;
-            display: flex;
-            align-items: flex-end;
-            justify-content: flex-end;
-            height: 100vh;
-            color: white;
-            position: relative;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
         }
 
-        .nav-bar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 60px;
-            background-color: #2d184d;
-            border-radius: 0 10px 10px 0;
-            transition: width 0.3s ease;
+        :root {
+            --bg-color: #343541;
+            --text-color: #ffffff;
+            --input-bg: #40414f;
+            --border-color: #555766;
+        }
+
+        .light-mode {
+            --bg-color: #ffffff;
+            --text-color: #343541;
+            --input-bg: #f7f7f8;
+            --border-color: #d9d9e3;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            overflow: hidden;
         }
 
-        .menu-icon {
-            width: 30px;
-            height: 30px;
-            margin: 10px 0;
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
         }
 
-        .nav-bar.active {
-            width: 200px;
+        .chat-message {
+            margin: 15px 0;
+            padding: 12px 18px;
+            border-radius: 8px;
+            max-width: 80%;
+            word-break: break-word;
         }
 
-        .content {
-            text-align: center;
+        .user-message {
+            background: var(--input-bg);
+            margin-left: auto;
+        }
+
+        .bot-message {
+            background: var(--border-color);
+            margin-right: auto;
+        }
+
+        .input-container {
+            padding: 15px;
+            background: var(--bg-color);
+            border-top: 1px solid var(--border-color);
             display: flex;
-            align-items: center;
+            gap: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text-color);
+            outline: none;
+        }
+
+        #send-btn {
+            padding: 12px 20px;
+            background: #10a37f;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        #send-btn:hover {
+            opacity: 0.8;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
             justify-content: center;
-            position: relative;
-            flex-grow: 1;
         }
 
-        .icon {
-            width: 50%;
-            height: 50vh;
-            object-fit: contain;
+        .theme-btn {
+            padding: 8px 15px;
+            background: var(--input-bg);
+            border: none;
+            border-radius: 5px;
+            color: var(--text-color);
+            cursor: pointer;
         }
 
-        #date-time {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            font-size: 12px;
-            font-family: Arial, sans-serif;
-        }
-
-        @keyframes iconExpand {
-            to {
-                transform: translate(50%, -50%) scale(0.5);
+        @media (max-width: 600px) {
+            .chat-message {
+                max-width: 90%;
+                padding: 10px 15px;
             }
-        }
-
-        @keyframes iconMinimize {
-            to {
-                transform: translate(0, 0) scale(0.8);
-            }
-        }
-
-        @keyframes iconReturn {
-            to {
-                transform: translate(50%, -50%) scale(0.8);
-            }
-        }
-
-        @keyframes iconMoveToCorner {
-            to {
-                transform: translate(100%, 0) scale(0.5);
+            
+            #user-input {
+                padding: 10px;
             }
         }
     </style>
-    <title>PurpleDragonSO</title>
 </head>
 <body>
-    <div class="nav-bar">
-        <img src="img/iconmenu.png" alt="Ícone do Menu" class="menu-icon">
+    <div class="controls">
+        <button class="theme-btn" onclick="toggleTheme()">Alternar Tema</button>
     </div>
-    <div class="content">
-        <img src="img/icon.png" alt="Ícone do Sistema" class="icon">
-        <div id="date-time"></div>
+    
+    <div class="chat-container" id="chat-container"></div>
+    
+    <div class="input-container">
+        <input type="text" id="user-input" placeholder="Digite sua mensagem...">
+        <button id="send-btn" onclick="sendMessage()">Enviar</button>
     </div>
+
+    <script>
+        const API_URL = 'https://api.g4f.ai/v1/chat/completions'; // API pública[citation:5]
+
+        let isLightMode = localStorage.getItem('theme') === 'light';
+        if (isLightMode) document.body.classList.add('light-mode');
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            isLightMode = !isLightMode;
+            localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+        }
+
+        function addMessage(message, isUser = true) {
+            const chatContainer = document.getElementById('chat-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.textContent = message;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const userInput = document.getElementById('user-input');
+            const message = userInput.value.trim();
+            
+            if (!message) return;
+
+            userInput.value = '';
+            addMessage(message, true);
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        messages: [{ role: 'user', content: message }],
+                        model: 'gpt-3.5-turbo'
+                    })
+                });
+
+                const data = await response.json();
+                addMessage(data.choices[0].message.content, false);
+            } catch (error) {
+                addMessage('Desculpe, ocorreu um erro. Tente novamente.', false);
+            }
+        }
+
+        document.getElementById('user-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
 </body>
 </html>
-
-<!-- script.js -->
-
-let isNavBarExpanded = false;
-
-function toggleNavBar() {
-    const navBar = document.querySelector('.nav-bar');
-    isNavBarExpanded = !isNavBarExpanded;
-
-    const icon = document.querySelector('.icon');
-    const iconExpandDuration = 0.3;
-
-    navBar.classList.toggle('active', isNavBarExpanded);
-
-    if (isNavBarExpanded) {
-        icon.style.animation = `iconExpand ${iconExpandDuration}s forwards, iconMoveToCorner ${iconExpandDuration}s ${iconExpandDuration}s forwards`;
-    } else {
-        icon.style.animation = `iconMinimize ${iconExpandDuration}s forwards`;
-
-        icon.addEventListener('animationend', () => {
-            if (!isNavBarExpanded) {
-                icon.style.animation = 'iconReturn 0.3s ease-out forwards';
-            }
-        }, { once: true });
-    }
-}
-
-document.querySelector('.menu-icon').addEventListener('click', toggleNavBar);
-document.querySelector('.icon').addEventListener('click', toggleNavBar);
-
-function atualizarDataHora() {
-    const elementoDataHora = document.getElementById('date-time');
-    const agora = new Date();
-
-    const options = { year: '2-digit', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', hour12: false };
-    const formatoDataHora = new Intl.DateTimeFormat('pt-BR', options);
-
-    const dataHoraFormatada = formatoDataHora.format(agora);
-    elementoDataHora.textContent = dataHoraFormatada;
-}
-
-atualizarDataHora();
-setInterval(atualizarDataHora, 60000);
